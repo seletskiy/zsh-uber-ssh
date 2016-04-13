@@ -1,6 +1,10 @@
-## Aliases for quick SSH access
+## Aliases for quick SSH access and remote completion
 
-![demo](https://raw.githubusercontent.com/seletskiy/zsh-uber-ssh/master/example.gif)
+### Aliases
+![alias demo](https://raw.githubusercontent.com/seletskiy/zsh-uber-ssh/master/example.gif)
+
+### Completion
+![completion demo](https://raw.githubusercontent.com/seletskiy/zsh-uber-ssh/master/example-completion.gif)
 
 ### Installation
 ### zgen
