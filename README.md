@@ -2,6 +2,13 @@
 
 ![demo](https://raw.githubusercontent.com/seletskiy/zsh-uber-ssh/master/example.gif)
 
+### Installation
+### zgen
+
+```zsh
+zgen load seletskiy/zsh-uber-ssh
+```
+
 ### Rules
 
 ```zsh
