@@ -1,4 +1,6 @@
-## Aliases for fast SSH access
+## Aliases for quick SSH access
+
+![demo](https://raw.githubusercontent.com/seletskiy/zsh-uber-ssh/master/example.gif)
 
 ### Rules
 
@@ -30,7 +32,7 @@ alias -s x='uber-ssh:alias -R .x'
 
 ### Tips and tricks
 
-```
+```zsh
 alias -s L='uber-ssh:alias -P 192.168. -R .L'
 
     $ root@2.1.L --> ssh root@192.168.2.1
