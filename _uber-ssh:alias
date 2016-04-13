@@ -1,0 +1,69 @@
+#compdef uber-ssh:alias
+
+zstyle ':completion::complete:uber-ssh:alias::files' command '-:uber-ssh:complete-remote'
+zstyle ':completion::complete:uber-ssh:alias::files' remote-access yes
+
+function :uber-ssh:complete() {
+    local login
+    local identity
+    local interactive
+
+    local args=()
+    local address
+    :uber-ssh:parse-command-line "${(@)words:1}"
+
+    local words=('ssh' "${args[@]}")
+
+    set -- "${(@)words:1}"
+
+    zparseopts -a opts -D \
+        'b:' 'c:' 'D:' 'E:' 'e:' 'F:' 'I:' 'L:' 'm:' 'O:' 'o:' \
+        'p:' 'Q:' 'R:' 'S:' 'W:' 'w:' \
+        'l:=login' \
+        'i:=identity' \
+        '1' '2' '4' '6' 'A' 'a' 'C' 'f' 'G' 'g' 'K' 'k' 'M' 'N' 'n' 'q' \
+        's' 'T' 'V' 'v' 'X' 'x' 'Y' 'y' \
+        't=interactive'
+
+    if [ $# -gt 0 -a $? -eq 0 ]; then
+        (( CURRENT = ${#words} ))
+
+        local ssh_args=("${@:1}")
+        _remote_files -h $address -- unused
+    else
+        (( CURRENT = ${#words} ))
+        service=ssh _ssh
+    fi
+}
+
+function :uber-ssh:complete-remote() {
+    shift 1 # unused
+
+    local hostname="$1"
+
+    if [ "${#ssh_args}" -eq 1 ]; then
+        if grep -qe '[./]' <<< "${ssh_args[1]}"; then
+            local complete_command="ls -d1FL \$(compgen -f ${ssh_args[1]})"
+        else
+            local complete_command="compgen -c ${ssh_args[1]}"
+        fi
+    else
+        local complete_command=$(cat <<BASH
+        builtin source /etc/bash_completion && {
+            COMP_WORDS=(${ssh_args[@]});
+            COMP_LINE='${ssh_args[@]}';
+            COMP_POINT=\${#COMP_LINE};
+            COMP_CWORD=${#ssh_args};
+            COMP_FUNC=\$(complete -p | grep -Eo -- "-F \w+ \${COMP_WORDS[0]}$" | cut -f2 -d' ');
+            eval \$COMP_FUNC "\${COMP_WORDS[@]}";
+            printf '%s\n' "\${COMPREPLY[@]}"
+        }
+BASH
+)
+    fi
+
+    command ssh $hostname $login $identity "$(cat <<< $complete_command)"
+}
+
+
+:uber-ssh:complete "${@}"
