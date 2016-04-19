@@ -48,18 +48,25 @@ function :uber-ssh:complete-remote() {
             local complete_command="compgen -c ${ssh_args[1]}"
         fi
     else
-        local complete_command=$(cat <<BASH
-        builtin source /etc/bash_completion && {
-            COMP_WORDS=(${ssh_args[@]});
-            COMP_LINE='${ssh_args[@]}';
-            COMP_POINT=\${#COMP_LINE};
-            COMP_CWORD=${#ssh_args};
-            COMP_FUNC=\$(complete -p | grep -Eo -- "-F \w+ \${COMP_WORDS[0]}$" | cut -f2 -d' ');
-            eval \$COMP_FUNC "\${COMP_WORDS[@]}";
-            printf '%s\n' "\${COMPREPLY[@]}"
-        }
+        if grep -qe '[./]' <<< "${ssh_args[-1]}"; then
+            local complete_command="ls -d1FL \$(compgen -f ${ssh_args[-1]})"
+        else
+            local complete_command=$(cat <<BASH
+            builtin source /etc/bash_completion && {
+                COMP_WORDS=(${ssh_args[@]});
+                COMP_LINE='${ssh_args[@]}';
+                COMP_POINT=\${#COMP_LINE};
+                COMP_CWORD=${#ssh_args};
+                COMP_FUNC=\$(complete -p \
+                    | grep -Eo -- "-F \w+ \${COMP_WORDS[0]}$" \
+                    | cut -f2 -d' '
+                );
+                eval \$COMP_FUNC "\${COMP_WORDS[@]}";
+                printf '%s\n' "\${COMPREPLY[@]}"
+            }
 BASH
 )
+        fi
     fi
 
     command ssh $hostname $login $identity "$(cat <<< $complete_command)"
