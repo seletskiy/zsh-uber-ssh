@@ -13,7 +13,7 @@ EOF
 
     :uber-ssh:parse-command-line "${@}"
 
-    $ssh_command -XY -t $address "${args[@]}"
+    SSH_ADDRESS=$address $ssh_command -XY -t $address "${args[@]}"
 }
 
 function :uber-ssh:parse-command-line() {
